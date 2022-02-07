@@ -1,7 +1,6 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-const res = require('express/lib/response');
-const teamMembers = [];
+
 
 const db = mysql.createConnection(
     {
@@ -75,6 +74,16 @@ const employeeQuestions = [
     }
 ];
 
+const update = [
+    {
+        type: 'list',
+        name: 'choice',
+        message: 'What would you like to update?',
+        choices: ['first name', 'last name', 'role id', 'manager id']
+    }
+]
+
+
 function init() {
     inquirer.prompt(questions)
         .then(answer => {
@@ -143,8 +152,8 @@ function viewAllEmployees() {
 
 function addADepartment() {
     inquirer.prompt(deptQuestions).then(answers => {
-        const sql = `INSERT INTO department(name) VALUES(${answers.dept})`;
-        db.query(sql, params, (err, res) => {
+        const sql = `INSERT INTO department(name) VALUES("${answers.dept}")`;
+        db.query(sql, (err, res) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
@@ -159,14 +168,14 @@ function addADepartment() {
 
 function addARole() {
     inquirer.prompt(roleQuestions).then(answers => {
-        const sql = `INSERT INTO role (title, salary, department_id) VALUES (${answers.title}, ${answers.salary}, ${answers.deptid})`;
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES ("${answers.title}", "${answers.salary}", "${answers.deptid}")`;
         db.query(sql, (err, res) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
             console.log('\n');
-            console.log('ADD A DEPARTMENT');
+            console.log('ADD A ROLE');
             console.log('\n');
             console.table(res);
         })
@@ -175,36 +184,157 @@ function addARole() {
 
 function addAnEmployee() {
     inquirer.prompt(employeeQuestions).then(answers => {
-        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (${answers.first}, ${answers.last}, ${answers.role}, ${answers.manager})`;
+        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answers.first}", "${answers.last}", "${answers.role}", "${answers.manager}")`;
         db.query(sql, (err, res) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
             console.log('\n');
-            console.log('ADD A DEPARTMENT');
+            console.log('ADD A EMPLOYEE');
             console.log('\n');
             console.table(res);
         })
     })
 };
 
-/* function updateEmployee() {
-    inquirer.prompt(deptQuestions).then(answers => {
-        const sql = `INSERT INTO department (name) VALUES (${answers.dept})`;
-        const params = [body.dept];
-        db.query(sql, params, (err, res) => {
+
+function updateEmployee() {
+    inquirer.prompt(update)
+        .then(answer => {
+            if (answer.choice === 'first name') {
+                updateFirst();
+            } else if (answer.choice === 'last name') {
+                updateLast();
+            } else if (answer.choice === 'role id') {
+                updateRoleId();
+            } else if (answer.choice === 'manager id') {
+                updateManagerId();
+            } 
+        })
+    };
+
+const firstName = [
+    {
+        type: 'input',
+        name: 'pickid',
+        message: 'What is the id of the employee you want to update?(hint: dont know id? Go to the menu and select view all employees and find the employee and id you want to change!'
+    },
+    {
+        type: 'input',
+        name: 'firstname',
+        message: 'What would you like to update the employees first name too?'
+    }
+]
+
+const lastName = [
+    {
+        type: 'input',
+        name: 'pickid',
+        message: 'What is the id of the employee you want to update?(hint: dont know id? Go to the menu and select view all employees and find the employee and id you want to change!'
+    },
+    {
+        type: 'input',
+        name: 'lastname',
+        message: 'What would you like to update the employees last name too?'
+    }
+]
+
+const roleIdQuestions = [
+    {
+        type: 'input',
+        name: 'pickid',
+        message: 'What is the id of the employee you want to update?(hint: dont know id? Go to the menu and select view all employees and find the employee and id you want to change!'
+    },
+    {
+        type: 'list',
+        name: 'roleids',
+        message: 'What would you like to update the employees role ID too?',
+        choices: ['1: Lead Sales', '2: Salesperson', '3: Lead Engineer', '4: Software Engineer', '5: Account Manager', '6: Accountant', '7: Legal Team Lead', '8: Lawyer']
+    }
+]
+
+const managerIdQuestions = [
+    {
+        type: 'input',
+        name: 'pickid',
+        message: 'What is the id of the employee you want to update?(hint: dont know id? Go to the menu and select view all employees and find the employee and id you want to change!'
+    },
+    {
+        type: 'input',
+        name: 'managerids',
+        message: 'What would you like to update the employees manager ID too?',
+    }
+]
+
+function updateFirst() {
+    inquirer.prompt(firstName)
+    .then(answer => {
+        const sql = `UPDATE employee SET first_name = "${answer.firstname}" WHERE id = "${answer.pickid}"`;
+        db.query(sql, (err, res) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
             console.log('\n');
-            console.log('ADD A DEPARTMENT');
+            console.log('UPDATE EMPLOYEE FIRST NAME');
             console.log('\n');
             console.table(res);
         })
     })
-}; */
+};
+
+function updateLast() {
+    inquirer.prompt(lastName)
+    .then(answer => {
+        const sql = `UPDATE employee SET last_name = "${answer.lastname}" WHERE id = "${answer.pickid}"`;
+        db.query(sql, (err, res) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            console.log('\n');
+            console.log('UPDATE EMPLOYEE LAST NAME');
+            console.log('\n');
+            console.table(res);
+        })
+    })
+};
+
+function updateRoleId() {
+    inquirer.prompt(roleIdQuestions)
+    .then(answer => {
+        const sql = `UPDATE employee SET role_id = "${answer.roleids}" WHERE id = "${answer.pickid}"`;
+        db.query(sql, (err, res) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            console.log('\n');
+            console.log('UPDATE EMPLOYEE ROLE ID');
+            console.log('\n');
+            console.table(res);
+        })
+    })
+};
+
+function updateManagerId() {
+    inquirer.prompt(managerIdQuestions)
+    .then(answer => {
+        const sql = `UPDATE employee SET manager_id = "${answer.managerids}" WHERE id = "${answer.pickid}"`;
+        db.query(sql, (err, res) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            console.log('\n');
+            console.log('UPDATE EMPLOYEE MANAGER ID');
+            console.log('\n');
+            console.table(res);
+        })
+    })
+};
+        
 
 
 
