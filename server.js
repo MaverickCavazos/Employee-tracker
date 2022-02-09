@@ -62,10 +62,10 @@ const employeeQuestions = [
         message: 'What is the employees last name?'
     },
     {
-        type: 'list',
+        type: 'input',
         name: 'role',
-        message: 'What role does the employee have?',
-        choices: ['Lead Sales', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer']
+        message: 'What role ID does the employee have? (hint: Lead Sales = 1, Salesperson = 2, Lead Engineer = 3, Software Engineer = 4, Account Manager = 5, Accountant = 6, Legal Team Lead = 7, Lawyer = 8'
+        
     },
     {
         type: 'input',
@@ -155,8 +155,8 @@ function addADepartment() {
         const sql = `INSERT INTO department(name) VALUES("${answers.dept}")`;
         db.query(sql, (err, res) => {
             if (err) {
-                res.status(500).json({ error: err.message });
-                return;
+                console.log(res)
+                console.log(err)
             }
             console.log('\n');
             console.log('ADD A DEPARTMENT');
@@ -168,11 +168,11 @@ function addADepartment() {
 
 function addARole() {
     inquirer.prompt(roleQuestions).then(answers => {
-        const sql = `INSERT INTO role (title, salary, department_id) VALUES ("${answers.title}", "${answers.salary}", "${answers.deptid}")`;
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES ("${answers.title}", ${answers.salary}, ${answers.deptid})`;
         db.query(sql, (err, res) => {
             if (err) {
-                res.status(500).json({ error: err.message });
-                return;
+                console.log(res)
+                console.log(err)
             }
             console.log('\n');
             console.log('ADD A ROLE');
@@ -184,11 +184,11 @@ function addARole() {
 
 function addAnEmployee() {
     inquirer.prompt(employeeQuestions).then(answers => {
-        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answers.first}", "${answers.last}", "${answers.role}", "${answers.manager}")`;
+        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answers.first}", "${answers.last}", ${answers.role}, ${answers.manager})`;
         db.query(sql, (err, res) => {
             if (err) {
-                res.status(500).json({ error: err.message });
-                return;
+                console.log(res)
+                console.log(err)
             }
             console.log('\n');
             console.log('ADD A EMPLOYEE');
@@ -210,9 +210,9 @@ function updateEmployee() {
                 updateRoleId();
             } else if (answer.choice === 'manager id') {
                 updateManagerId();
-            } 
+            }
         })
-    };
+};
 
 const firstName = [
     {
@@ -247,11 +247,11 @@ const roleIdQuestions = [
         message: 'What is the id of the employee you want to update?(hint: dont know id? Go to the menu and select view all employees and find the employee and id you want to change!'
     },
     {
-        type: 'list',
+        type: 'input',
         name: 'roleids',
-        message: 'What would you like to update the employees role ID too?',
-        choices: ['1: Lead Sales', '2: Salesperson', '3: Lead Engineer', '4: Software Engineer', '5: Account Manager', '6: Accountant', '7: Legal Team Lead', '8: Lawyer']
-    }
+        message: 'What role ID does the employee have? (hint: Lead Sales = 1, Salesperson = 2, Lead Engineer = 3, Software Engineer = 4, Account Manager = 5, Accountant = 6, Legal Team Lead = 7, Lawyer = 8'
+        
+    },
 ]
 
 const managerIdQuestions = [
@@ -269,72 +269,72 @@ const managerIdQuestions = [
 
 function updateFirst() {
     inquirer.prompt(firstName)
-    .then(answer => {
-        const sql = `UPDATE employee SET first_name = "${answer.firstname}" WHERE id = "${answer.pickid}"`;
-        db.query(sql, (err, res) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            console.log('\n');
-            console.log('UPDATE EMPLOYEE FIRST NAME');
-            console.log('\n');
-            console.table(res);
+        .then(answer => {
+            const sql = `UPDATE employee SET first_name = "${answer.firstname}" WHERE id = ${answer.pickid}`;
+            db.query(sql, (err, res) => {
+                if (err) {
+                    console.log(res)
+                    console.log(err)
+                }
+                console.log('\n');
+                console.log('UPDATE EMPLOYEE FIRST NAME');
+                console.log('\n');
+                console.table(res);
+            })
         })
-    })
 };
 
 function updateLast() {
     inquirer.prompt(lastName)
-    .then(answer => {
-        const sql = `UPDATE employee SET last_name = "${answer.lastname}" WHERE id = "${answer.pickid}"`;
-        db.query(sql, (err, res) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            console.log('\n');
-            console.log('UPDATE EMPLOYEE LAST NAME');
-            console.log('\n');
-            console.table(res);
+        .then(answer => {
+            const sql = `UPDATE employee SET last_name = "${answer.lastname}" WHERE id = ${answer.pickid}`;
+            db.query(sql, (err, res) => {
+                if (err) {
+                    console.log(res)
+                    console.log(err)
+                }
+                console.log('\n');
+                console.log('UPDATE EMPLOYEE LAST NAME');
+                console.log('\n');
+                console.table(res);
+            })
         })
-    })
 };
 
 function updateRoleId() {
     inquirer.prompt(roleIdQuestions)
-    .then(answer => {
-        const sql = `UPDATE employee SET role_id = "${answer.roleids}" WHERE id = "${answer.pickid}"`;
-        db.query(sql, (err, res) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            console.log('\n');
-            console.log('UPDATE EMPLOYEE ROLE ID');
-            console.log('\n');
-            console.table(res);
+        .then(answer => {
+            const sql = `UPDATE employee SET role_id = ${answer.roleids} WHERE id = ${answer.pickid}`;
+            db.query(sql, (err, res) => {
+                if (err) {
+                    console.log(res)
+                    console.log(err)
+                }
+                console.log('\n');
+                console.log('UPDATE EMPLOYEE ROLE ID');
+                console.log('\n');
+                console.table(res);
+            })
         })
-    })
 };
 
 function updateManagerId() {
     inquirer.prompt(managerIdQuestions)
-    .then(answer => {
-        const sql = `UPDATE employee SET manager_id = "${answer.managerids}" WHERE id = "${answer.pickid}"`;
-        db.query(sql, (err, res) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            console.log('\n');
-            console.log('UPDATE EMPLOYEE MANAGER ID');
-            console.log('\n');
-            console.table(res);
+        .then(answer => {
+            const sql = `UPDATE employee SET manager_id = ${answer.managerids} WHERE id = ${answer.pickid}`;
+            db.query(sql, (err, res) => {
+                if (err) {
+                    console.log(res)
+                    console.log(err)
+                }
+                console.log('\n');
+                console.log('UPDATE EMPLOYEE MANAGER ID');
+                console.log('\n');
+                console.table(res);
+            })
         })
-    })
 };
-        
+
 
 
 
